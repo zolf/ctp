@@ -15,7 +15,7 @@
 // Developed this on Mac OS X 10.8.5 and Ubuntu 12.04 64bits
 // for Mac OS X install the Commandline toolchain from the dev site
 // 
-// build gcc dump_pcap -lpcap -o dump_pcap
+// build gcc dump_pcapstats -lpcap -o dump_pcapstats
 //
 // changes: 
 //    0.1 just a POC
