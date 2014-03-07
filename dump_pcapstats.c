@@ -27,6 +27,7 @@
 //    0.5 added some BPF stuff    
 //    0.6 added ID and extended usage()
 //    0.7 fixes :)
+//    0.8 more fixes and ttl, src and dst map 
 //
 //// ==========================================================================================
 #include<stdio.h>
