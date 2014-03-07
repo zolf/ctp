@@ -15,7 +15,6 @@
 // Developed this on Mac OS X 10.8.5 and Ubuntu 12.04 64bits
 // for Mac OS X install the Commandline toolchain from the dev site
 // 
-// 
 // build gcc dump_pcap -lpcap -o dump_pcap
 //
 // changes: 
@@ -46,7 +45,7 @@
 #define VLAN_TAG_LEN 4        	// no clue if or where it's defined
 #define IP_HDR_LEN 20        	// no clue if or where it's defined
 
-#define DUMP_VERSION "0.7c"
+#define DUMP_VERSION "0.8a"
 unsigned long pkt_count  = 0;   // some overall counters. The packets seen
 unsigned long data_count = 0;   // i full wire size of the packets
 unsigned long host_count = 0;   // the number of uniq ip's seen
@@ -86,13 +85,16 @@ unsigned long  *****root = NULL;
 struct bpf_program bpf_f;
 char use_filter = 0;
 
+// create a map of the TTL values seen
 char ttlFlag = 0;
 unsigned long *ttlMap = NULL;
+// create a map of the sourceports seen
 char srcFlag = 0;
 unsigned long *srcMap = NULL;
+// create a map of the dest ports seen
 char dstFlag = 0;
 unsigned long *dstMap = NULL;
-
+// when multiple filenames
 unsigned long fileCount = 0 ;
 
 //// ==========================================================================================
@@ -128,7 +130,7 @@ int i;
                     usage(argv[0]);
                     return -1;
 
-              case 'f':
+              case 'f':   // argument the bpf filter in quotes
                    if((i+2) < argc) {
                       filter=argv[i+1];
                       fprintf(stderr, "INFO: got filter: %s\n", filter); // 
@@ -144,7 +146,7 @@ int i;
                    }
                    break;
 
-              case 't':
+              case 't':  // create ttl map
 		   ttlFlag++;
 		   ttlMap = malloc((UCHAR_MAX+1) * sizeof(unsigned long *));
 		   if(ttlMap == NULL) {
@@ -155,7 +157,7 @@ int i;
                    }
 		   break;
 
-              case 's':
+              case 's': // source map
 		   srcFlag++;
 		   srcMap = malloc((USHRT_MAX + 1) * sizeof(unsigned long *));
 		   if(srcMap == NULL) {
@@ -166,7 +168,7 @@ int i;
                    }
 		   break;
 
-              case 'd':
+              case 'd': // dest map
 		   dstFlag++;
 		   dstMap = malloc((USHRT_MAX + 1) * sizeof(unsigned long *));
 		   if(dstMap == NULL) {
@@ -264,6 +266,9 @@ void usage(char *v)
   fprintf(stderr, "USAGE: %s filename(s) -> files to process, if filename is - then use STDIN\n", v);
   fprintf(stderr, "USAGE: %s -f \"BPF filter\" filename(s) -> Supply a BPF filter and cap file's to process\n", v);
   fprintf(stderr, "USAGE: %s -h (this help)\n", v);
+  fprintf(stderr, "USAGE: %s -t ttl map\n", v);
+  fprintf(stderr, "USAGE: %s -s src port count\n", v);
+  fprintf(stderr, "USAGE: %s -d dest port count\n", v);
   fprintf(stderr, "USAGE: Header explained:\n");
   fprintf(stderr, "#IP SNDPCKT RCVPCKT TCP UDP ICMP SNDATA RCVDATA [SRCTTL] FIRST_D FIRST_T LAST_D LAST_T [IP] [ID]\n");
   fprintf(stderr, "#IP          The IP address seen\n");
@@ -344,6 +349,7 @@ void dispatcher_handler(u_char *temp1, const struct pcap_pkthdr *header, const u
 			break;
                 case IPPROTO_TCP:
                         if(srcFlag && header->caplen > (ETHER_HDR_LEN + IP_HDR_LEN + 10) ) {
+			   // should calc proper ip hdr len
                            tcph = (struct tcphdr *)((unsigned char *)iph + IP_HDR_LEN);
                            srcMap[ntohs(tcph->source)]++;
                         }
@@ -393,6 +399,7 @@ void dispatcher_handler(u_char *temp1, const struct pcap_pkthdr *header, const u
                        break;
                   case IPPROTO_TCP:
                         if(dstFlag && header->caplen > (ETHER_HDR_LEN + IP_HDR_LEN + 10) ) {
+			   // should calc proper ip hdr len
                            tcph = (struct tcphdr *)((unsigned char *)iph + IP_HDR_LEN);
                            dstMap[ntohs(tcph->dest)]++;
                         }
