@@ -1,18 +1,18 @@
 //// ==========================================================================================
 // Just Another program to dump/extract data from pcap files. This to make a quick assessment
-// you ask tshark ?, Yes WIreshark/Tshark are very, very nice tools, but not realy effective
+// you ask tshark ?, Yes Wireshark/Tshark are very, very nice tools, but not realy effective
 // when you play with multi giga byte on cap files, and just want some high level info.
 //
 // Also implemented a weird storage structure to speedup things 
 // 
 // BUGS: i guess yes
 //
-// Restrictions: yes, i does what I want and need.
+// Restrictions: yes, it does what i want and need.
 //       only wants ethernet or ethernet + vlan frames
 //       only accepts ip v4 packets
 // 
 // flos@xs4all.nl 2013/10/14 
-// Developed this on Mac OS X 10.8.5 and Ubuntu 12.04 64bits
+// Developed this on Ubuntu 12.04 64bits
 // for Mac OS X install the Commandline toolchain from the dev site
 // 
 // build gcc dump_pcapstats -lpcap -o dump_pcapstats
@@ -184,7 +184,7 @@ int i;
             } // end switch
          } else { // argv[i][0] != '-'
                 fileCount++;
-	        if(argc>2) fprintf(stderr, "INFO: opening %s\n", argv[i]); // argc > 2 multiple filenames
+	        fprintf(stderr, "INFO: opening %s\n", argv[i]); 
 	        /* Open the capture file */
 	    	if ( (fp= pcap_open_offline( argv[i], errbuf)) == NULL) {
 	        	fprintf(stderr,"ERROR: %s %s.\n", argv[i], errbuf);
@@ -268,24 +268,24 @@ void usage(char *v)
   fprintf(stderr, "USAGE: %s -f \"BPF filter\" filename(s) -> Supply a BPF filter and cap file's to process\n", v);
   fprintf(stderr, "USAGE: %s -h (this help)\n", v);
   fprintf(stderr, "USAGE: %s -t ttl map\n", v);
-  fprintf(stderr, "USAGE: %s -s src port count\n", v);
-  fprintf(stderr, "USAGE: %s -d dest port count\n", v);
+  fprintf(stderr, "USAGE: %s -s src tcp port count\n", v);
+  fprintf(stderr, "USAGE: %s -d dst tcp port count\n", v);
   fprintf(stderr, "USAGE: Header explained:\n");
   fprintf(stderr, "#IP SNDPCKT RCVPCKT TCP UDP ICMP SNDATA RCVDATA [SRCTTL] FIRST_D FIRST_T LAST_D LAST_T [IP] [ID]\n");
   fprintf(stderr, "#IP          The IP address seen\n");
-  fprintf(stderr, "#SNDPCKT     Number of packets where IP was the Source\n");
-  fprintf(stderr, "#RCVPCKT     Number of packets where IP was the Destination\n");
+  fprintf(stderr, "#SNDPCKT     Number of packets where IP was the source\n");
+  fprintf(stderr, "#RCVPCKT     Number of packets where IP was the destination\n");
   fprintf(stderr, "#TCP         Total number of TCP packets (src+dest)\n");
   fprintf(stderr, "#UDP         Total number of UDP packets (src_dest)\n");
   fprintf(stderr, "#ICMP        Total number of ICMP packets (src+dest)\n");
-  fprintf(stderr, "#SNDDATA     Number of bytes (including headers) where IP is the Source\n");
-  fprintf(stderr, "#RCVDATA     Number of bytes (including headers) where IP is the Destination\n");
-  fprintf(stderr, "#[SRCTTL]    The TTL of last packet processed for this IP as Source\n");
-  fprintf(stderr, "#FIRST_D     GMT date of the earliest packet seen for this Source IP\n");
-  fprintf(stderr, "#FIRST_T     GMT time of the earliest packet seen for this Source IP\n");
+  fprintf(stderr, "#SNDDATA     Number of bytes (including headers) where IP is the source\n");
+  fprintf(stderr, "#RCVDATA     Number of bytes (including headers) where IP is the destination\n");
+  fprintf(stderr, "#[SRCTTL]    The TTL of last packet processed for this IP as source\n");
+  fprintf(stderr, "#FIRST_D     GMT date of the earliest packet seen for this source IP\n");
+  fprintf(stderr, "#FIRST_T     GMT time of the earliest packet seen for this source IP\n");
   fprintf(stderr, "#LAST_D      GMT date of the last packet seen for this IP\n");
   fprintf(stderr, "#LAST_T      GMT time of the last packet seen for this IP\n");
-  fprintf(stderr, "#[IP]        The other IP address of the last packet processed for this IP\n");
+  fprintf(stderr, "#[IP]        The dest IP address of the last packet processed for this source IP\n");
   fprintf(stderr, "#[ID]        The ID field of the last packet processed for this source IP\n");
 }
 
