@@ -264,10 +264,11 @@ void usage(char *v)
 {
   fprintf(stderr, "INFO: %s Version %s\n", v, DUMP_VERSION);
   fprintf(stderr, "INFO: Using %s\n", pcap_lib_version() );
-  fprintf(stderr, "USAGE: %s filename(s) -> files to process, if filename is - then use STDIN\n", v);
+#  fprintf(stderr, "USAGE: %s filename(s) -> files to process, if filename is - then use STDIN\n", v);
+  fprintf(stderr, "USAGE: %s filename(s) -> files to process\n", v);
   fprintf(stderr, "USAGE: %s -f \"BPF filter\" filename(s) -> Supply a BPF filter and cap file's to process\n", v);
   fprintf(stderr, "USAGE: %s -h (this help)\n", v);
-  fprintf(stderr, "USAGE: %s -t ttl map\n", v);
+  fprintf(stderr, "USAGE: %s -t ttl map, dumps a table with the counts of each ttl seen\n", v);
   fprintf(stderr, "USAGE: %s -s src tcp port count\n", v);
   fprintf(stderr, "USAGE: %s -d dst tcp port count\n", v);
   fprintf(stderr, "USAGE: Header explained:\n");
