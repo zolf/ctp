@@ -46,7 +46,7 @@
 #define VLAN_TAG_LEN 4        	// no clue if or where it's defined
 #define IP_HDR_LEN 20        	// no clue if or where it's defined
 
-#define DUMP_VERSION "0.8a"
+#define DUMP_VERSION "0.8b"
 unsigned long pkt_count  = 0;   // some overall counters. The packets seen
 unsigned long data_count = 0;   // i full wire size of the packets
 unsigned long host_count = 0;   // the number of uniq ip's seen
@@ -223,7 +223,7 @@ int i;
          long j;
          fprintf(stdout, "#SRCMAP:");
          for(j=0;j<=USHRT_MAX;j++) {
-            if(srcMap[j]>0) fprintf(stdout, " %d,%lu", j, srcMap[j]);
+            if(srcMap[j]>0) fprintf(stdout, " %lu,%lu", j, srcMap[j]);
          }
          fprintf(stdout, "\n");
          free(srcMap);
@@ -235,7 +235,7 @@ int i;
          long j;
          fprintf(stdout, "#DSTMAP:");
          for(j=0;j<=USHRT_MAX;j++) {
-            if(dstMap[j]>0) fprintf(stdout, " %d,%lu", j, dstMap[j]);
+            if(dstMap[j]>0) fprintf(stdout, " %lu,%lu", j, dstMap[j]);
          }
          free(dstMap);
          dstMap = NULL;
@@ -264,10 +264,11 @@ void usage(char *v)
 {
   fprintf(stderr, "INFO: %s Version %s\n", v, DUMP_VERSION);
   fprintf(stderr, "INFO: Using %s\n", pcap_lib_version() );
-  fprintf(stderr, "USAGE: %s filename(s) -> files to process, if filename is - then use STDIN\n", v);
+//  fprintf(stderr, "USAGE: %s filename(s) -> files to process, if filename is - then use STDIN\n", v);
+  fprintf(stderr, "USAGE: %s filename(s) -> files to process\n", v);
   fprintf(stderr, "USAGE: %s -f \"BPF filter\" filename(s) -> Supply a BPF filter and cap file's to process\n", v);
   fprintf(stderr, "USAGE: %s -h (this help)\n", v);
-  fprintf(stderr, "USAGE: %s -t ttl map\n", v);
+  fprintf(stderr, "USAGE: %s -t ttl map, dumps a table with the counts of each ttl seen\n", v);
   fprintf(stderr, "USAGE: %s -s src tcp port count\n", v);
   fprintf(stderr, "USAGE: %s -d dst tcp port count\n", v);
   fprintf(stderr, "USAGE: Header explained:\n");
