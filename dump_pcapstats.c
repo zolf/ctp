@@ -46,7 +46,7 @@
 #define VLAN_TAG_LEN 4        	// no clue if or where it's defined
 #define IP_HDR_LEN 20        	// no clue if or where it's defined
 
-#define DUMP_VERSION "0.8b"
+#define DUMP_VERSION "0.8c"
 unsigned long pkt_count  = 0;   // some overall counters. The packets seen
 unsigned long data_count = 0;   // i full wire size of the packets
 unsigned long host_count = 0;   // the number of uniq ip's seen
@@ -79,7 +79,8 @@ char header_printed = 0;
 sHost *mapping_get_host(unsigned long);
 int mapping_ip(unsigned long);
 int mapping_init(void);
-int mapping_dump(void);
+int mapping_print(void);
+int mapping_free(void);
 int mapping_print_record(u_char, u_char, u_char, u_char, sHost *h);
 unsigned long  *****root = NULL;
 
@@ -204,7 +205,12 @@ int i;
         } 
     } // end for loop
 
-    mapping_dump();     // print the record details and free the memory
+    if(use_filter) {
+        fprintf(stdout, "## Filter : %s\n", filter);
+    }
+
+    mapping_print();     // print the record details
+    mapping_free();     // free the memory
 
     // if we counted TTL's report them to	
     if(ttlFlag) {
@@ -448,16 +454,11 @@ void dispatcher_handler(u_char *temp1, const struct pcap_pkthdr *header, const u
 
 
 
-
-
-
-
 //// ==========================================================================================
-// walk the table created if there is a 'record' print it and 
-// free the memory 
+// walk the table created and free the memory 
 // at the end the table should zero size
 //// ==========================================================================================
-int mapping_dump(void)
+int mapping_free(void)
 {
 int idx0, idx1, idx2, idx3;
 sHost *sH;
@@ -470,9 +471,6 @@ for(idx0 = 0; idx0 < 256; idx0++) {
             if(root[idx0][idx1][idx2] != NULL) {
               for(idx3=0;idx3<256;idx3++) {
                  if(root[idx0][idx1][idx2][idx3] != NULL) {
-                     sH = (sHost *)(root[idx0][idx1][idx2][idx3]);
-                     host_count++;
-                     mapping_print_record(idx0,idx1,idx2,idx3,(sHost *)sH);
                      free(root[idx0][idx1][idx2][idx3]);
                  } // if idx3
               } // for idx3
@@ -486,6 +484,41 @@ for(idx0 = 0; idx0 < 256; idx0++) {
   } // if idx0
 } // for idx0
 free(root);
+root = NULL;
+return 0;
+}
+
+
+
+
+//// ==========================================================================================
+// walk the table created if there is a 'record' print it 
+//// ==========================================================================================
+int mapping_print(void)
+{
+int idx0, idx1, idx2, idx3;
+sHost *sH;
+host_count = 0;
+
+for(idx0 = 0; idx0 < 256; idx0++) {
+  if(root[idx0] != NULL) {
+    for(idx1=0;idx1 < 256; idx1++) {
+       if(root[idx0][idx1] != NULL) {
+         for(idx2=0;idx2 < 256 ; idx2++) {
+            if(root[idx0][idx1][idx2] != NULL) {
+              for(idx3=0;idx3<256;idx3++) {
+                 if(root[idx0][idx1][idx2][idx3] != NULL) {
+                     sH = (sHost *)(root[idx0][idx1][idx2][idx3]);
+                     host_count++;
+                     mapping_print_record(idx0,idx1,idx2,idx3,(sHost *)sH);
+                 } // if idx3
+              } // for idx3
+            } // if idx2
+         } // for idx2
+       } // if idx1
+    } // for idx1
+  } // if idx0
+} // for idx0
 return 0;
 }
 
